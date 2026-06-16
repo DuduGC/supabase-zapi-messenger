@@ -1,73 +1,84 @@
-# supabase-zapi-messenger
+# Supabase Z-API Messenger
 
-Serviço em Python que lê mensagens pendentes no Supabase e as envia via [Z-API](https://developer.z-api.io/) (WhatsApp).
+Projeto em Python que lê contatos do **Supabase** e envia mensagens personalizadas no **WhatsApp** usando a **Z-API**.
 
-## Estrutura
+## Tecnologias
 
-```
-supabase-zapi-messenger/
-├── app/
-│   ├── main.py       # Loop principal de processamento
-│   ├── database.py   # Cliente e queries Supabase
-│   ├── sender.py     # Envio de mensagens via Z-API
-│   └── config.py     # Variáveis de ambiente
-├── .env
-├── requirements.txt
-└── venv/
-```
+* Python
+* Supabase
+* Z-API
+* Requests
+* Python Dotenv
 
-## Pré-requisitos
+---
 
-- Python 3.11+
-- Conta Supabase com tabela `messages`
-- Instância Z-API configurada
+## Setup da tabela no Supabase
 
-### Tabela `messages` (exemplo)
+Crie uma tabela chamada:
 
 ```sql
-create table messages (
-  id uuid primary key default gen_random_uuid(),
-  phone text not null,
-  message text not null,
-  status text not null default 'pending',
-  error text,
-  created_at timestamptz not null default now()
-);
+Contatos
 ```
+
+Com as colunas:
+
+| Campo    | Tipo |
+| -------- | ---- |
+| id       | int8 |
+| Nome     | text |
+| Telefone | text |
+
+Exemplo:
+
+| id | Nome   | Telefone      |
+| -- | ------ | ------------- |
+| 1  | Rafael | 5511999999999 |
+
+**Formato do telefone:**
+
+```txt
+5511999999999
+```
+
+Sem espaços, traços ou `+`.
+
+---
+
+## Variáveis de ambiente (.env)
+
+Crie um arquivo `.env` na raiz do projeto:
+
+```env
+SUPABASE_URL=sua_url
+SUPABASE_KEY=sua_chave
+
+ZAPI_INSTANCE_ID=seu_instance_id
+ZAPI_TOKEN=seu_token
+ZAPI_SECURITY_TOKEN=seu_security_token
+```
+
+---
 
 ## Instalação
 
+Instale as dependências:
+
 ```bash
-python -m venv venv
-
-# Windows
-venv\Scripts\activate
-
-# Linux/macOS
-source venv/bin/activate
-
 pip install -r requirements.txt
 ```
 
-Copie `.env` e preencha com suas credenciais.
+---
 
-## Execução
+## Como rodar
 
-Na raiz do projeto:
+Execute o projeto:
 
 ```bash
 python -m app.main
 ```
 
-O serviço consulta mensagens com `status = 'pending'`, envia via Z-API e atualiza o status para `sent` ou `failed`.
+Saída esperada:
 
-## Variáveis de ambiente
-
-| Variável | Descrição |
-|----------|-----------|
-| `SUPABASE_URL` | URL do projeto Supabase |
-| `SUPABASE_KEY` | Chave de API (service role recomendada) |
-| `ZAPI_INSTANCE_ID` | ID da instância Z-API |
-| `ZAPI_TOKEN` | Token da instância |
-| `ZAPI_CLIENT_TOKEN` | Client token (se exigido pela conta) |
-| `POLL_INTERVAL_SECONDS` | Intervalo entre ciclos (padrão: 10) |
+```txt
+[SUCESSO] Mensagem enviada para Rafael
+```
